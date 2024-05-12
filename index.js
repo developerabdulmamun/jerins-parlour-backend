@@ -26,9 +26,19 @@ async function run() {
     await client.connect();
 
     const servicesCollection = client.db("parlourDB").collection("services");
+    const testimonialsCollection = client
+      .db("parlourDB")
+      .collection("testimonials");
 
+    // Services related api
     app.get("/services", async (req, res) => {
       const result = await servicesCollection.find().toArray();
+      res.send(result);
+    });
+
+    // Testimonials related api
+    app.get("/testimonials", async (req, res) => {
+      const result = await testimonialsCollection.find().toArray();
       res.send(result);
     });
 
