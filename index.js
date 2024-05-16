@@ -26,9 +26,7 @@ async function run() {
     await client.connect();
 
     const servicesCollection = client.db("parlourDB").collection("services");
-    const testimonialsCollection = client
-      .db("parlourDB")
-      .collection("testimonials");
+    const reviewsCollection = client.db("parlourDB").collection("reviews");
 
     // Services related api
     app.get("/services", async (req, res) => {
@@ -36,9 +34,15 @@ async function run() {
       res.send(result);
     });
 
-    // Testimonials related api
-    app.get("/testimonials", async (req, res) => {
-      const result = await testimonialsCollection.find().toArray();
+    // Reviews related api
+    app.get("/reviews", async (req, res) => {
+      const result = await reviewsCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.post("/reviews", async (req, res) => {
+      const review = req.body;
+      const result = await reviewsCollection.insertOne(review);
       res.send(result);
     });
 
