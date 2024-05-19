@@ -34,6 +34,12 @@ async function run() {
       res.send(result);
     });
 
+    app.post("/services", async (req, res) => {
+      const service = req.body;
+      const result = await servicesCollection.insertOne(service);
+      res.send(result);
+    });
+
     // Reviews related api
     app.get("/reviews", async (req, res) => {
       const result = await reviewsCollection.find().toArray();
