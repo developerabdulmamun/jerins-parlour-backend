@@ -40,6 +40,23 @@ async function run() {
       res.send(result);
     });
 
+    app.put("/services/:id", async (req, res) => {
+      const id = req.params.id;
+      const service = req.body;
+      const filter = { _id: new ObjectId(id) };
+
+      const updatedService = {
+        $set: {
+          heading: service.heading,
+          description: service.description,
+          price: service.price,
+        },
+      };
+
+      const result = await servicesCollection.updateOne(filter, updatedService);
+      res.send(result);
+    });
+
     app.delete("/services/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
