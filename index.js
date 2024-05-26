@@ -29,6 +29,7 @@ async function run() {
 
     const servicesCollection = client.db("parlourDB").collection("services");
     const reviewsCollection = client.db("parlourDB").collection("reviews");
+    const teamCollection = client.db("parlourDB").collection("team");
 
     // Services related api
     app.get("/services", async (req, res) => {
@@ -75,6 +76,12 @@ async function run() {
     app.post("/reviews", async (req, res) => {
       const review = req.body;
       const result = await reviewsCollection.insertOne(review);
+      res.send(result);
+    });
+
+    // Team Member related api
+    app.get("/team", async (req, res) => {
+      const result = await teamCollection.find().toArray();
       res.send(result);
     });
 
