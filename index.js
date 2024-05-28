@@ -27,9 +27,22 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
+    const usersCollection = client.db("parlourDB").collection("users");
     const servicesCollection = client.db("parlourDB").collection("services");
     const reviewsCollection = client.db("parlourDB").collection("reviews");
     const teamCollection = client.db("parlourDB").collection("team");
+
+    // Users related api
+    app.get("/users", async (req, res) => {
+      const result = await usersCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.post("/users", async (req, res) => {
+      const user = req.body;
+      const result = await usersCollection.insertOne(user);
+      res.send(result);
+    });
 
     // Services related api
     app.get("/services", async (req, res) => {
