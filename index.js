@@ -31,6 +31,7 @@ async function run() {
     const servicesCollection = client.db("parlourDB").collection("services");
     const reviewsCollection = client.db("parlourDB").collection("reviews");
     const teamCollection = client.db("parlourDB").collection("team");
+    const bookingsCollection = client.db("parlourDB").collection("bookings");
 
     // Users related api
     app.get("/users", async (req, res) => {
@@ -102,6 +103,19 @@ async function run() {
     // Team Member related api
     app.get("/team", async (req, res) => {
       const result = await teamCollection.find().toArray();
+      res.send(result);
+    });
+
+    //Bookings related api
+    app.get("/bookings", async (req, res) => {
+      const result = await bookingsCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.post("/bookings", async (req, res) => {
+      const booking = req.body;
+      booking.status = "Pending";
+      const result = await bookingsCollection.insertOne(booking);
       res.send(result);
     });
 
