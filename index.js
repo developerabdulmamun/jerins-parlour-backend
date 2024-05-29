@@ -108,6 +108,11 @@ async function run() {
 
     //Bookings related api
     app.get("/bookings", async (req, res) => {
+      const result = await bookingsCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.get("/bookings", async (req, res) => {
       const email = req.query.email;
       const query = { email: email };
       const result = await bookingsCollection.find(query).toArray();
