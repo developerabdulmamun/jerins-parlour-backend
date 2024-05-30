@@ -126,6 +126,18 @@ async function run() {
       res.send(result);
     });
 
+    app.put("/bookings/:id", async (req, res) => {
+      const id = req.params.id;
+      const { status } = req.body;
+      const filter = { _id: new ObjectId(id) };
+
+      const updateDoc = { $set: { status } };
+
+      const result = await bookingsCollection.updateOne(filter, updateDoc);
+
+      res.send(result);
+    });
+
     // Payment related api
     app.post("/create-payment-intent", async (req, res) => {
       const { amount } = req.body;
