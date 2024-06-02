@@ -4,13 +4,14 @@ const cors = require("cors");
 require("dotenv").config();
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+
 const port = process.env.PORT || 5000;
 
 // middleware
 app.use(cors());
 app.use(express.json());
 
-const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@jerinsparlour.0gavi6r.mongodb.net/?retryWrites=true&w=majority&appName=jerinsparlour`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -108,13 +109,8 @@ async function run() {
 
     //Bookings related api
     app.get("/bookings", async (req, res) => {
-      const result = await bookingsCollection.find().toArray();
-      res.send(result);
-    });
-
-    app.get("/bookings", async (req, res) => {
       const email = req.query.email;
-      const query = { email: email };
+      const query = email ? { email: email } : {};
       const result = await bookingsCollection.find(query).toArray();
       res.send(result);
     });
@@ -151,6 +147,29 @@ async function run() {
       res.send({
         clientSecret: paymentIntent.client_secret,
       });
+    });
+
+    // Admin related api
+    app.patch("/make-admin", async (req, res) => {
+      const { email } = req.body;
+
+      const query = { email };
+      const user = await usersCollection.findOne(query);
+
+      if (!user) {
+        return res
+          .status(404)
+          .send({ message: "User not found. Please sign up." });
+      }
+
+      const updateDoc = { $set: { role: "admin" } };
+      const result = await usersCollection.updateOne(query, updateDoc);
+
+      if (result.modifiedCount > 0) {
+        res.send({ message: "User has been made an admin." });
+      } else {
+        res.status(500).send({ message: "Failed to make the user an admin." });
+      }
     });
 
     // Send a ping to confirm a successful connection
