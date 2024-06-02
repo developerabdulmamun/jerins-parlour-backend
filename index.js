@@ -74,9 +74,27 @@ async function run() {
     };
 
     // Users related api
-    app.get("/users", async (req, res) => {
+    app.get("/users", verifyToken, verifyAdmin, async (req, res) => {
       const result = await usersCollection.find().toArray();
       res.send(result);
+    });
+
+    app.get("/users/admin/:email", verifyToken, async (req, res) => {
+      const email = req.params.email;
+
+      if (email !== req.decoded.email) {
+        return res.status(403).send({ message: "forbidden access" });
+      }
+
+      const query = { email: email };
+      const user = await usersCollection.findOne(query);
+
+      let admin = false;
+      if (user) {
+        admin = user?.role === "admin";
+      }
+
+      res.send({ admin });
     });
 
     app.post("/users", async (req, res) => {
@@ -98,13 +116,13 @@ async function run() {
       res.send(result);
     });
 
-    app.post("/services", async (req, res) => {
+    app.post("/services", verifyToken, verifyAdmin, async (req, res) => {
       const service = req.body;
       const result = await servicesCollection.insertOne(service);
       res.send(result);
     });
 
-    app.put("/services/:id", async (req, res) => {
+    app.put("/services/:id", verifyToken, verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const service = req.body;
       const filter = { _id: new ObjectId(id) };
@@ -121,7 +139,7 @@ async function run() {
       res.send(result);
     });
 
-    app.delete("/services/:id", async (req, res) => {
+    app.delete("/services/:id", verifyToken, verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await servicesCollection.deleteOne(query);
@@ -161,7 +179,7 @@ async function run() {
       res.send(result);
     });
 
-    app.put("/bookings/:id", async (req, res) => {
+    app.put("/bookings/:id", verifyToken, verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const { status } = req.body;
       const filter = { _id: new ObjectId(id) };
